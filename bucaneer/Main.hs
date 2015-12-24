@@ -5,6 +5,7 @@ module Main where
   import qualified Deckhand.Harpoons.Heartpwn as HPWN
   import qualified Deckhand.Deck as DK
   import Data.List (intersperse)
+  import Control.Concurrent.Async
   import Data.Functor
   import System.Environment
 
@@ -17,8 +18,10 @@ module Main where
     args <- getArgs
     case args of
       [] -> putStrLn $ "You need to specify one or more of " ++ (unwords $ intersperse "|" (map show [HPWN.Hot, HPWN.New, HPWN.Week, HPWN.Month, HPWN.AllTime]))
-      [a] -> getDecksFromHeartpwnSource $ read a
-      as  -> mapM_ getDecksFromHeartpwnSource (map read as)
+      as  -> do
+        _ <- mapConcurrently (getDecksFromHeartpwnSource) (map read as)
+        return ()
+
 
 
   getDecksFromHeartpwnSource :: HPWN.HeartpwnDeckSource -> IO ()
@@ -32,7 +35,7 @@ module Main where
       mapM_ saveDeckToFile urlsAndFilesToFetch
 
   saveDeckToFile :: UrlAndFileName -> IO ()
-  saveDeckToFile (url, fileName) = HPWN.getDeck url >>= (\d -> DK.toFile d (deckhandDeckCache `FP.combine` fileName))
+  saveDeckToFile (url, fileName) = putStrLn ("*** Getting deck at " ++ url) >> HPWN.getDeck url >>= (\d -> DK.toFile d (deckhandDeckCache `FP.combine` fileName))
 
 
 
