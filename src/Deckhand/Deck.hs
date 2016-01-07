@@ -30,7 +30,7 @@ where
   fromTuple :: (String, String) -> CardSet
   fromTuple t = (fst t, read $ snd t)
 
-  fromFile :: FilePath -> IO (Deck)
+  fromFile :: FilePath -> IO Deck
   fromFile path = do
     eitherErorrOrCVS <- T.parseCSVFromFile path
     case eitherErorrOrCVS of
@@ -45,8 +45,8 @@ where
 
   parseCardSet :: T.Record -> Maybe CardSet
   parseCardSet r
-                | length r >= 2 = Just ( r !! 0, read $ r !! 1)
-                | otherwise    = Nothing
+                | length r >= 2 = Just ( head r, read $ r !! 1)
+                | otherwise     = Nothing
 {-
   parseDeck :: V.Vector (String,String,String) -> Deck
   parseDeck v = V.toList $ parseOneCardSet <$> v

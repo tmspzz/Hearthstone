@@ -17,9 +17,9 @@ module Main where
   main = do
     args <- getArgs
     case args of
-      [] -> putStrLn $ "You need to specify one or more of " ++ (unwords $ intersperse "|" (map show [HPWN.Hot, HPWN.New, HPWN.Week, HPWN.Month, HPWN.AllTime]))
+      [] -> putStrLn $ "You need to specify one or more of " ++ unwords (intersperse "|" (map show [HPWN.Hot, HPWN.New, HPWN.Week, HPWN.Month, HPWN.AllTime]))
       as  -> do
-        _ <- mapConcurrently (getDecksFromHeartpwnSource) (map read as)
+        _ <- mapConcurrently getDecksFromHeartpwnSource (map read as)
         return ()
 
 
@@ -31,7 +31,7 @@ module Main where
       let fileNames = HPWN.fileNameFromDeckURI <$> partialDeckURLs
       filesInCache <- getFilesFromCache
       let urlsAndFiles = zip completeDecksURLs fileNames -- [( http:// ... , some file name extracted from the url)]
-      let urlsAndFilesToFetch = [ (url, fileName) | (url, fileName) <- urlsAndFiles, not $ fileName `elem` filesInCache]
+      let urlsAndFilesToFetch = [ (url, fileName) | (url, fileName) <- urlsAndFiles, fileName `notElem` filesInCache]
       mapM_ saveDeckToFile urlsAndFilesToFetch
 
   saveDeckToFile :: UrlAndFileName -> IO ()
@@ -39,11 +39,11 @@ module Main where
 
 
 
-  getFilesFromCache :: IO ([FilePath])
+  getFilesFromCache :: IO [FilePath]
   getFilesFromCache = do
         D.createDirectoryIfMissing True deckhandDeckCache
         files <- D.getDirectoryContents deckhandDeckCache
-        return $ [f | f<- files, f /= "." && f /= ".."]
+        return [f | f<- files, f /= "." && f /= ".."]
 
   deckhandCache :: FilePath
   deckhandCache = ".deckhand"
