@@ -14,6 +14,7 @@ where
   import qualified Data.List as L (intersperse, intersect, union)
   import qualified Data.ByteString.Lazy.Char8 as B
   import Data.Char
+  import Data.List (intercalate)
   import Data.Functor
   import Deckhand.Deck as DK
   import qualified System.FilePath.Posix as FP (takeFileName)
@@ -38,15 +39,13 @@ where
 
   getDeckURIsFromHeartpwnDeckSource source = do
     let doc = fromUrl $  urlFromHeartpwnDeckSource source
-    partialDeckURLs <- runX $ doc >>> css "span.tip" >>> css "a" ! "href"
-    return partialDeckURLs
+    runX $ doc >>> css "span.tip" >>> css "a" ! "href"
 
-  fileNameFromDeckURI = (concat . L.intersperse "-" . tail . splitAtDash . FP.takeFileName)
+  fileNameFromDeckURI = intercalate "-" . tail . splitAtDash . FP.takeFileName
 
   getDeck url = do
     page <- simpleHttp url
-    deck <- parseDeckFromHTML $ readString [withParseHTML yes, withWarnings no] $ B.unpack page
-    return deck
+    parseDeckFromHTML $ readString [withParseHTML yes, withWarnings no] $ B.unpack page
 
   parseDeckFromHTML doc = do
     listOfNamesAndQuantities <- runX $ doc
@@ -57,7 +56,7 @@ where
 
 
   removeUnwatedChars :: String -> String
-  removeUnwatedChars = reverse . dropWhile (isSpace) . reverse . dropWhile (isSpace)
+  removeUnwatedChars = reverse . dropWhile isSpace . reverse . dropWhile isSpace
 
   wordsWhen     :: (Char -> Bool) -> String -> [String]
   wordsWhen p s = case dropWhile p s of
@@ -66,4 +65,3 @@ where
                             where (w, s'') = break p s'
 
   splitAtDash = wordsWhen (=='-')
-

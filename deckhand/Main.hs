@@ -12,10 +12,21 @@ module Main where
   main :: IO ()
   main = getArgs >>= parseArgs
 
+
+  diffUsage :: String
+  diffUsage = "Usage: deckhand diff your_cards.csv a_deck_file"
+
+  mindiffUsage :: String
+  mindiffUsage = "Usage: deckhand mindiff your_card.sv dir_with_deck_files/"
+
   parseArgs :: [String] -> IO ()
   parseArgs [] = do
-                putStrLn $ "Usage: deckhand diff your_cards.csv a_deck_file"
-                putStrLn $ "Usage: deckhand mindiff your_card.sv dir_with_deck_files/"
+                putStrLn diffUsage
+                putStrLn mindiffUsage
+  parseArgs args | length args <= 2 = case head args of
+                                        "diff" -> putStrLn diffUsage
+                                        "mindiff" -> putStrLn mindiffUsage
+                                        otherwise -> putStrLn $ unwords $ "Unrecognized command: ":args
   parseArgs [cmd, ownDeck, path] | cmd == "diff" = do
                                       diffDeck <-  path `diffDeckFiles` ownDeck
                                       let numMissingCards = length diffDeck
@@ -29,9 +40,7 @@ module Main where
                                       intDiffs <- mapM (diffDeckFiles' ownDeck) allFiles
                                       let filesAndScore = zip allFiles intDiffs
                                       putStrLn $ unlines $ map show (sortBy (compare `on` snd) filesAndScore)
-                                      -- mapM diffDeckFiles'
-                                 | otherwise = do
-                                      putStrLn $ "Unriecognized command " ++ cmd
+                                 | otherwise = putStrLn $ "Unrecognized command: " ++ cmd
 
 
   diffDeckFiles :: FilePath -> FilePath -> IO DK.Deck

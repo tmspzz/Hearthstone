@@ -17,6 +17,7 @@ where
   import qualified Data.ByteString as B
   import qualified Data.ByteString.Lazy as BL
   import qualified Data.Vector as V
+  import Data.Char (toLower)
   import Data.Functor
   import Control.Applicative
 
@@ -28,7 +29,7 @@ where
 
 
   fromTuple :: (String, String) -> CardSet
-  fromTuple t = (fst t, read $ snd t)
+  fromTuple t = (map toLower $ fst t, read $ snd t)
 
   fromFile :: FilePath -> IO Deck
   fromFile path = do
@@ -45,21 +46,9 @@ where
 
   parseCardSet :: T.Record -> Maybe CardSet
   parseCardSet r
-                | length r >= 2 = Just ( head r, read $ r !! 1)
+                | length r >= 2 = Just (map toLower $ head r, read $ r !! 1)
                 | otherwise     = Nothing
-{-
-  parseDeck :: V.Vector (String,String,String) -> Deck
-  parseDeck v = V.toList $ parseOneCardSet <$> v
 
-  parseOneCardSet :: (String, String, String) -> CardSet
-  parseOneCardSet (n, q, _) = (n, read q)
-
-  parseDeck'   :: V.Vector (String,String) -> Deck
-  parseDeck' v = V.toList $ parseOneCardSet' <$> v
-
-  parseOneCardSet'       :: (String, String) -> CardSet
-  parseOneCardSet' (n,q) = (n, read q)
--}
   difference :: Deck -> Deck -> Deck
   difference d1 d2 = let d1Map = M.fromList d1
                          d2Map = M.fromList d2
@@ -73,4 +62,3 @@ where
   toFile deck path = do
     BL.writeFile path $ D.encode deck
     return ()
-
