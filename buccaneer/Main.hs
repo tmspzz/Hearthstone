@@ -2,7 +2,7 @@ module Main where
 
   import qualified System.FilePath.Posix as FP (combine)
   import qualified System.Directory as D
-  import qualified Deckhand.Harpoons.Heartpwn as HPWN
+  import qualified Deckhand.Harpoons.Hearthpwn as HPWN
   import qualified Deckhand.Deck as DK
   import qualified Network.URI as N
   import Data.List (intersperse, nub)
@@ -18,7 +18,7 @@ module Main where
   parseCommand :: Parser Command
   parseCommand = subparser $
           command "rip"    (parseRip `withInfo` "Rip one of more deck URLs") <>
-          command "scrape" (parseScrape `withInfo` ("Scrape a Heartpwn source for all decks. One or more of " ++ sources))
+          command "scrape" (parseScrape `withInfo` ("Scrape a Hearthpwn source for all decks. One or more of " ++ sources))
           where
             sources = unwords (intersperse "|" (map show [HPWN.Hot, HPWN.New, HPWN.Week, HPWN.Month, HPWN.AllTime]))
 
@@ -43,7 +43,7 @@ module Main where
     cmd <- execParser opts
     case cmd of
       Rip urls -> void $ mapConcurrently (runMaybeT . getDeckFromURL) (nub urls)
-      Scrape sources -> void $ mapConcurrently getDecksFromHeartpwnSource (map (read . nub) sources)
+      Scrape sources -> void $ mapConcurrently getDecksFromHearthpwnSource (map (read . nub) sources)
 
 
   getDeckFromURL :: String -> MaybeT IO ()
@@ -54,12 +54,12 @@ module Main where
   getDeckFromURI uri = MaybeT ( pure . N.uriAuthority $ uri)
     >>= pure . N.uriRegName
     >>= \x ->  case x of
-      "www.hearthpwn.com" -> lift . getDeckFromHeartpwnURI $ uri
+      "www.hearthpwn.com" -> lift . getDeckFromHearthpwnURI $ uri
       "www.tempostorm.com" -> lift . getDeckFromTempostormURI $ uri
       otherwise -> lift $ void (putStrLn ("Unsupported URL " ++ N.uriToString id uri ""))
 
-  getDeckFromHeartpwnURI :: N.URI -> IO ()
-  getDeckFromHeartpwnURI uri = do
+  getDeckFromHearthpwnURI :: N.URI -> IO ()
+  getDeckFromHearthpwnURI uri = do
     filesInCache <- getFilesFromCache
     saveDeckToFile urlAndFileName
     where
@@ -70,9 +70,9 @@ module Main where
   getDeckFromTempostormURI :: N.URI -> IO ()
   getDeckFromTempostormURI uri = undefined
 
-  getDecksFromHeartpwnSource :: HPWN.HeartpwnDeckSource -> IO ()
-  getDecksFromHeartpwnSource source = do
-      partialDeckURLs <- HPWN.getDeckURIsFromHeartpwnDeckSource source
+  getDecksFromHearthpwnSource :: HPWN.HearthpwnDeckSource -> IO ()
+  getDecksFromHearthpwnSource source = do
+      partialDeckURLs <- HPWN.getDeckURIsFromHearthpwnDeckSource source
       let completeDecksURLs = HPWN.toDeckURL <$> partialDeckURLs
       let fileNames = HPWN.fileNameFromDeckURI <$> partialDeckURLs
       filesInCache <- getFilesFromCache

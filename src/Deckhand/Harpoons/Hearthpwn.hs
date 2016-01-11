@@ -1,9 +1,9 @@
-module Deckhand.Harpoons.Heartpwn
-  ( HeartpwnDeckSource(..)
-    , urlFromHeartpwnDeckSource
+module Deckhand.Harpoons.Hearthpwn
+  ( HearthpwnDeckSource(..)
+    , urlFromHearthpwnDeckSource
     , toDeckURL
     , getDeck
-    , getDeckURIsFromHeartpwnDeckSource
+    , getDeckURIsFromHearthpwnDeckSource
     , fileNameFromDeckURI
   )
 where
@@ -19,27 +19,32 @@ where
   import Deckhand.Deck as DK
   import qualified System.FilePath.Posix as FP (takeFileName)
 
-  data HeartpwnDeckSource = Hot | New | Week | Month | AllTime deriving (Show, Read, Eq)
+  data HearthpwnDeckSource = Hot | New | Week | Month | AllTime deriving (Show, Read, Eq)
 
-  idFromHeartpwnDeckSource :: HeartpwnDeckSource -> String
-  idFromHeartpwnDeckSource Hot = show 1
-  idFromHeartpwnDeckSource New = show 2
-  idFromHeartpwnDeckSource Week = show 3
-  idFromHeartpwnDeckSource Month = show 4
-  idFromHeartpwnDeckSource AllTime = show 5
+  idFromHearthpwnDeckSource :: HearthpwnDeckSource -> String
+  idFromHearthpwnDeckSource Hot = show 1
+  idFromHearthpwnDeckSource New = show 2
+  idFromHearthpwnDeckSource Week = show 3
+  idFromHearthpwnDeckSource Month = show 4
+  idFromHearthpwnDeckSource AllTime = show 5
 
-  heartpwnBaseURL = "http://www.hearthpwn.com"
-  heartpwnDecksSearchURL = heartpwnBaseURL ++ "/decks?filter-deck-tag="
+  hearthpwnBaseURL :: String
+  hearthpwnBaseURL = "http://www.hearthpwn.com"
 
-  urlFromHeartpwnDeckSource :: HeartpwnDeckSource -> String
-  urlFromHeartpwnDeckSource source = heartpwnDecksSearchURL ++ idFromHeartpwnDeckSource source ++ "&cookieTest=1"
+  hearthpwnDecksSearchURL :: String
+  hearthpwnDecksSearchURL = hearthpwnBaseURL ++ "/decks?filter-deck-tag="
+
+  urlFromHearthpwnDeckSource :: HearthpwnDeckSource -> String
+  urlFromHearthpwnDeckSource source = hearthpwnDecksSearchURL ++ idFromHearthpwnDeckSource source ++ "&cookieTest=1"
 
   toDeckURL   :: String -> String
-  toDeckURL a = heartpwnBaseURL ++ a
+  toDeckURL a = hearthpwnBaseURL ++ a
 
-  getDeckURIsFromHeartpwnDeckSource source = do
-    let doc = fromUrl $  urlFromHeartpwnDeckSource source
-    runX $ doc >>> css "span.tip" >>> css "a" ! "href"
+  getDeckURIsFromHearthpwnDeckSource source = runX $ doc
+    >>> css "span.tip"
+    >>> css "a" ! "href"
+      where
+        doc = fromUrl $  urlFromHearthpwnDeckSource source
 
   fileNameFromDeckURI = intercalate "-" . tail . splitAtDash . FP.takeFileName
 

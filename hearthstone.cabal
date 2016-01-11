@@ -19,7 +19,7 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Deckhand.Deck
-                       , Deckhand.Harpoons.Heartpwn
+                       , Deckhand.Harpoons.Hearthpwn
   build-depends:       base >= 4.6
                        , csv >= 0.1.2
                        , HandsomeSoup >= 0.4
