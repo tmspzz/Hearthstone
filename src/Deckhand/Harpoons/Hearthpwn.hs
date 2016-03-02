@@ -1,20 +1,20 @@
 module Deckhand.Harpoons.Hearthpwn
   ( HearthpwnDeckSource(..)
     , urlFromHearthpwnDeckSource
-    , toDeckURL
+    , hearthpwnBaseURL
     , getDeck
     , getDeckURIsFromHearthpwnDeckSource
     , fileNameFromDeckURI
+    , wordsWhen
   )
 where
 
   import Network.HTTP.Conduit
   import Text.XML.HXT.Core
   import Text.HandsomeSoup
-  import qualified Data.List as L (intersperse, intersect, union)
+  import qualified Data.List as L (intersperse, intersect, union, intercalate)
   import qualified Data.ByteString.Lazy.Char8 as B
   import Data.Char
-  import Data.List (intercalate)
   import Data.Functor
   import Deckhand.Deck as DK
   import qualified System.FilePath.Posix as FP (takeFileName)
@@ -46,8 +46,9 @@ where
       where
         doc = fromUrl $  urlFromHearthpwnDeckSource source
 
-  fileNameFromDeckURI = intercalate "-" . tail . splitAtDash . FP.takeFileName
+  fileNameFromDeckURI = L.intercalate "-" . tail . wordsWhen (=='-') . FP.takeFileName
 
+  getDeck :: String -> IO [CardSet]
   getDeck url = do
     page <- simpleHttp url
     parseDeckFromHTML $ readString [withParseHTML yes, withWarnings no] $ B.unpack page
@@ -63,10 +64,8 @@ where
   removeUnwatedChars :: String -> String
   removeUnwatedChars = reverse . dropWhile isSpace . reverse . dropWhile isSpace
 
-  wordsWhen     :: (Char -> Bool) -> String -> [String]
+  wordsWhen :: (Char -> Bool) -> String -> [String]
   wordsWhen p s = case dropWhile p s of
                       "" -> []
                       s' -> w : wordsWhen p s''
                             where (w, s'') = break p s'
-
-  splitAtDash = wordsWhen (=='-')

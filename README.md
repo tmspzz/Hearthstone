@@ -25,11 +25,19 @@ This modules is intended to deal with reading, wiring, diffing and whatever else
 
 The ``deckhand`` executable is a concrete example
 
-### Deckhand.Harpoons.Heartpwn
+### Deckhand.Harpoons
+
+This module contains common functions to all Harpoons. You can use this to build applications.
+
+``buccaneer`` executable is a concrete example
+
+#### Deckhand.Harpoons.Hearthpwn
  
 This module is intended to deal with grabbing deck information from [Hearthpwn](http://www.hearthpwn.com/)
 
-The ``bucaneer`` executable is a concrete example
+#### Deckhand.Harpoons.Tempostorm
+
+This module is intened to deal with grabbing deck information from [Tempostorm](http://tempostorm.com/)
 
 ## Executable - deckhand
 
@@ -48,14 +56,24 @@ $ deckhand mindiff MyHeartstoneLibrary.csv someDir
 
 This will give you an ascending list of decks in directory "someDir" according to deck distance (card difference between two decks)
 
-## Executable - bucaneer
+## Executable - buccaneer
 
 ``bucaneer`` scrapes decks from [Hearthpwn](http://www.hearthpwn.com/)
 
 ### Usage
 
 ```
-$ buccaneer Hot AllTime
+$ buccaneer --help
 ```
+Displayes the help dialogue
 
+```
+$ buccaneer scrape Hot AllTime
+```
 This will scrape decks in the Hot and AllTime list
+
+```
+$ buccaneer rip https://www.heathpwn.com/somedeck
+```
+Will rip the deck at the specified URL
+
