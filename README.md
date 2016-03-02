@@ -4,7 +4,7 @@ A Haskell Library and Utilities for Heartstone
 Hearstone is a cabal package that contains:
 
 - 1 library: Deckhand
-- 2 executables: ``deckhand`` and ``bucaneer``
+- 2 executables: ``deckhand`` and ``buccaneer``
 
 ## Library: Deckhand
 
