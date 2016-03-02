@@ -8,10 +8,12 @@ Hearstone is a cabal package that contains:
 
 ## Library: Deckhand
 
-Deckhand is composed of 2 modules:
+Deckhand is composed of 4 modules:
 
 - Deckhand.Deck
-- DeckHand.Harpoons.Heartpwn
+- Deckhand.Harpoons
+ - Deckhand.Harpoons.Heartpwn
+ - Deckhand.Harpoons.Tempostorm
 
 ### Deckhand.Deck
 
